@@ -20,7 +20,7 @@ const STEPS = [
   },
   {
     title: 'Open',
-    text: "The Chief Invigilator opens the paper in the room. The copy carries the invigilator's name and the time, and the board takes the key back after the exam.",
+    text: "The Chief Invigilator opens a watermarked copy in the room. If a copy ever turns up online, the leak check shows the minute before which only the author could have read it.",
   },
 ]
 
@@ -50,10 +50,11 @@ export default function LandingPage() {
 
       <section className="land-hero">
         <div className="land-copy">
-          <h1>Exam papers nobody can leak alone.</h1>
+          <h1>Exam papers with custody, but no custodian.</h1>
           <p className="lede">
-            Today, whoever runs the exam server can read the paper. Exam Vault seals each paper so that it opens only after two of three
-            board members agree, and no one in the university holds the key. Not the examiner, not the board, not IT.
+            Today a paper is only safe while someone trustworthy holds it: a courier, a locked trunk, whoever runs the exam server. Exam
+            Vault sends the sealed paper to every exam room in advance. It opens only after two of three board members sign its release,
+            and nobody holds the key. Not the examiner, not the board, not IT.
           </p>
           {signIn('Sign in with Tide', true)}
           <p className="land-note">A synthetic demo for the RMIT and Tide Unlocked hackathon. Built with TideCloak.</p>

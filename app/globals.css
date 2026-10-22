@@ -194,6 +194,14 @@ button { font: inherit; cursor: pointer; }
 
 .custody-head h2 { font-size: 18px; font-weight: 700; }
 .custody-head p { color: var(--pencil); font-size: 13.5px; margin-top: 2px; }
+.leak-check { margin-top: 14px; background: #fff; border: 1px solid var(--rule); border-left: 4px solid var(--signed); border-radius: 8px; padding: 14px 18px; }
+.leak-kicker { font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--signed); }
+.leak-lead { font-family: var(--serif); font-size: 19px; font-weight: 600; line-height: 1.35; margin-top: 4px; }
+.leak-facts { margin: 10px 0 0; display: grid; gap: 4px; }
+.leak-facts > div { display: grid; grid-template-columns: 170px minmax(0, 1fr); gap: 10px; font-size: 13.5px; }
+.leak-facts dt { color: var(--pencil); }
+.leak-facts dd { margin: 0; font-variant-numeric: tabular-nums; }
+.leak-foot { margin-top: 10px; font-size: 13px; color: var(--body); }
 .ledger { list-style: none; margin: 14px 0 0; padding: 0; border-top: 1px solid var(--rule); }
 .entry { display: grid; grid-template-columns: 70px 30px minmax(0, 1fr); gap: 12px; align-items: start; padding: 10px 0; border-bottom: 1px solid var(--rule); }
 .entry time { font-variant-numeric: tabular-nums; color: var(--pencil); font-size: 13px; padding-top: 4px; }
@@ -292,4 +300,8 @@ button { font: inherit; cursor: pointer; }
   .env-label { max-width: 80%; }
   .env-stamp { display: none; }
   .sheet { padding: 22px; }
+}
+
+@media (max-width: 640px) {
+  .leak-facts > div { grid-template-columns: 1fr; gap: 0; }
 }

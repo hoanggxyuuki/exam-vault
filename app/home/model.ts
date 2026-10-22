@@ -170,3 +170,34 @@ export function watermark(text: string): string {
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='460' height='240'><text x='20' y='150' transform='rotate(-22 230 120)' font-family='IBM Plex Sans, Arial, sans-serif' font-size='15' font-weight='600' fill='rgba(196,18,47,0.11)'>${safe}</text></svg>`
   return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`
 }
+
+export interface CustodyProof {
+  sealedAt: number
+  sealedBy: string
+  firstKey?: { at: number; holder: string; signers: string[] }
+  heldBefore: string[]
+  refused: { at: number; who: string }[]
+  opened: { at: number; who: string }[]
+}
+
+export function custodyProof(rec: ExamRecord, crs: ChangeRequest[], dir?: Directory): CustodyProof | null {
+  if (!rec.paper) return null
+  const since = Date.parse(rec.exam.createdAt) || 0
+  const sealedAt = Date.parse(rec.paper.sealedAt)
+  const grants = crs
+    .filter((c) => c.status === 'APPROVED' && c.actionType === 'GRANT_ROLES' && c.resolvedAt && isKeyChange(c, dir))
+    .filter((c) => Number(c.createdAt ?? 0) >= since)
+    .sort((a, b) => Number(a.resolvedAt) - Number(b.resolvedAt))
+  const first = grants[0]
+  const holder = first ? changeRequestTarget(first, dir).user : undefined
+  const pick = (kind: string) =>
+    rec.events.filter((e) => e.action === kind).map((e) => ({ at: Date.parse(e.at), who: e.actor })).sort((a, b) => a.at - b.at)
+  return {
+    sealedAt,
+    sealedBy: rec.paper.sealedBy,
+    firstKey: first && holder ? { at: Math.max(Number(first.resolvedAt), sealedAt), holder, signers: (first.authorizers ?? []).map((a) => a.username) } : undefined,
+    heldBefore: first ? [] : (dir?.keyHolders ?? []),
+    refused: pick('open-refused'),
+    opened: pick('opened'),
+  }
+}

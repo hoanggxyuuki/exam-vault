@@ -20,7 +20,7 @@ import {
   type ChangeRequest,
   type Directory,
 } from '@/lib/tide/governance'
-import { buildCustody, countdown, day, errorText, explainRefusal, person, sittingTime, type ExamRecord, type ExamRow, type Note, type OpenResult } from './model'
+import { buildCustody, countdown, custodyProof, day, errorText, explainRefusal, person, sittingTime, type ExamRecord, type ExamRow, type Note, type OpenResult } from './model'
 import { Sidebar } from './sidebar'
 import { Envelope } from './envelope'
 import { ReleasePanel } from './release-panel'
@@ -108,6 +108,7 @@ export default function HomePage() {
   }, [authenticated, getValueFromIdToken, refresh])
 
   const custody = useMemo(() => (record ? buildCustody(record, [...pending, ...decided], dir) : []), [record, pending, decided, dir])
+  const proof = useMemo(() => (record ? custodyProof(record, [...pending, ...decided], dir) : null), [record, pending, decided, dir])
 
   if (!authenticated) return null
 
@@ -300,7 +301,7 @@ export default function HomePage() {
                   view={view}
                   onView={setView}
                 />
-                <CustodyLog items={custody} code={exam.code} />
+                <CustodyLog items={custody} code={exam.code} proof={record?.exam.id === exam.id ? proof : null} />
               </div>
               <ReleasePanel
                 me={me}

@@ -2,34 +2,33 @@
 
 ## Project overview
 
-_Exam Vault seals exam papers so that no single person, not even the IT administrator, can open one until the exam board releases it._
+_Exam Vault is a custodian-free exam release system: papers wait in every exam room, and nobody, not even IT, can open one before the board signs its release._
 
 Built with [TideCloak](https://tide.org/tidecloak?utm_source=github&utm_medium=readme&utm_campaign=unlocked).
 
 ### 1. Vision & originality
-An exam office that never has to trust one person. The examiner seals the paper in the browser. On exam morning two of three board members sign its release in their own Tide enclaves. Only then can the Chief Invigilator open it.
+Exam Vault turns exam release from a custody problem into a policy problem. Papers wait as ciphertext in every room; opening is a signed, collective act, not a key someone holds. A new way to run high-stakes exams.
 
 ### 2. Trust constraint insight
-Whoever runs the server can read the paper: IT staff, backup operators, vendors, or anyone with one stolen admin password. A single leak forces a re-sit for hundreds of students, so papers still travel on USB sticks and in locked cabinets. Remove that insider and papers can live in software.
+Every exam has someone holding reusable authority over the paper. NEET-UG 2024 ran at 4,750 centres, and its paper was taken from a trunk at one. In software, that someone is whoever runs the server. Remove them and papers can be distributed early without being readable early.
 
 ### 3. Value & impact
-Exam officers stop couriering papers. Students stop paying for leaks with re-sits. IT staff stop being suspects. A phished administrator yields only ciphertext and a change request the board denies.
+Before: printed early, couriered, guarded. After: a paper for Melbourne and Hanoi is uploaded the night before and opens at 9:00 when two board members sign.
+- **Students:** fewer re-sits. UGC-NET 2024 was cancelled for 900,000 candidates over a doctored screenshot.
+- **Remote centres:** no strong rooms.
+- **Auditors:** proof of who could read each paper.
 
 ### 4. Why TideCloak matters
-- The Tide network encrypts each paper under a policy bound to its exam. The app holds no key to steal.
-- Release is TideCloak governance. The opening key is a change request that commits only when 2 of 3 board members sign, so an administrator's self-grant stops at 1 of 2.
-- The server only ever stores ciphertext.
+TideCloak cryptographically enforces who can decrypt and authorise release, even if the server is compromised. Each paper is encrypted under a policy bound to its exam; opening needs 2 of 3 board signatures. With ordinary login, whoever runs the server could override that.
 
 ### 5. Prototype & storytelling
-The [2-minute demo](demo/exam-vault-demo.mp4) runs on the live app:
-1. Hoa seals the paper. The server holds only ciphertext.
-2. Sam, the IT administrator, is refused by all 20 Tide nodes, and Sam's self-grant stalls.
-3. Hoa denies it and requests release. Sam countersigns. The chain of custody records each signature.
-4. Minh opens a watermarked copy in the exam room.
+The [2-minute demo](demo/exam-vault-demo.mp4) runs the live app. Hoa seals a paper; the server holds ciphertext only. **Key moment:** Sam, the IT administrator, clicks Open and all 20 Tide nodes refuse; Sam's self-grant stalls. Final proof: after 2 board signatures, Minh opens a watermarked copy, and the leak check shows only Hoa could read it earlier.
 
-![Exam Vault: sealed paper, release panel and chain of custody](docs/app.png)
+![Sealed paper](docs/app.png)
 
-![The released paper, watermarked for the Chief Invigilator](docs/open.png)
+![Watermarked copy](docs/open.png)
+
+![Leak check](docs/leak-check.png)
 
 ## Setup
 
@@ -60,10 +59,12 @@ The [2-minute demo](demo/exam-vault-demo.mp4) runs on the live app:
 - **Plan limit:** the free Tide plan allows 3 Tide accounts per realm. That is why the demo has three people, and all three sit on the board.
 - **Local network prompt:** Chrome may ask whether `ork1.tideprotocol.com` can reach `localhost`. Allow it, or sign-in and approvals time out.
 - **Data:** papers, signed policies and the app log live in `data/store.json`, which is gitignored. All people and papers are synthetic.
+- **Limits:** once a paper is open, nothing stops a photo of the screen. The watermark names who opened it and when. Revoking the key stops future opening, not copies already made.
 
 **What is in the app**
 - **Sealed envelope.** The paper is shown as a sealed exam envelope. Its security tint is the real ciphertext.
 - **Release panel.** Shows who may seal, who may open, and who holds the opening key right now. Each pending request has three signature seals that fill as board members sign.
+- **Leak check.** Sits on top of the chain of custody. It states the minute before which nobody but the author could have read the paper, who signed the release, every refused attempt, and when the paper was opened. If a copy surfaces online earlier than that minute, it can only have come from the author.
 - **Chain of custody.** A timeline per sitting. It merges the app's own log (sealed, opening refused, opened) with TideCloak's change requests: who asked, each signature with its time, the commit or the denial.
 - **Server view.** Shows the full server record for the sitting: ciphertext and signed policies, no key and no plaintext.
 - **Exam-room copy.** An opened paper carries a watermark with the holder's name and the time. **Present in exam room** shows it full screen.
