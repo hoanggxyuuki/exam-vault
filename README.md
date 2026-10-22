@@ -79,6 +79,10 @@ What a breach gets: the server holds ciphertext and signed policies, no key and 
 **Notes**
 - **Plan limit:** the free Tide plan allows 3 Tide accounts per realm. That is why the demo has three people, and all three sit on the board.
 - **Local network prompt:** Chrome may ask whether `ork1.tideprotocol.com` can reach `localhost`. Allow it, or sign-in and approvals time out.
+- **Windows:** run the commands in Git Bash or WSL, not PowerShell; the `NAME=value command` form in step 3 is bash syntax.
+- **"We are sorry…" at sign-in:** this is TideCloak's error page.
+  - `Invalid parameter: redirect_uri`: open exactly http://localhost:3000, not `127.0.0.1` or another port.
+  - `Client not found` or any other message: step 3 did not finish. It must run with its variables and print `All done`, because only then does it write `tidecloak.json` for your realm. It can also stop early if the Tide network briefly returns errors. Delete the realm in the admin console (http://localhost:8080, `admin` / `password`) and run step 3 again.
 - **Data:** papers, signed policies and the app log live in `data/store.json`, which is gitignored. All people and papers are synthetic.
 - **Limits:** once a paper is open, nothing stops a photo of the screen. The watermark names who opened it and when. Revoking the key stops future opening, not copies already made.
 
