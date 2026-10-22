@@ -2,33 +2,45 @@
 
 ## Project overview
 
-_Exam Vault is a custodian-free exam release system: papers wait in every exam room, and nobody, not even IT, can open one before the board signs its release._
+_Exam Vault removes unilateral release authority from exams: boards can distribute papers early to every centre, and nobody, not even IT, can open one before the board signs its release._
 
 Built with [TideCloak](https://tide.org/tidecloak?utm_source=github&utm_medium=readme&utm_campaign=unlocked).
 
 ### 1. Vision & originality
-Exam Vault turns exam release from a custody problem into a policy problem. Papers wait as ciphertext in every room; opening is a signed, collective act, not a key someone holds. A new way to run high-stakes exams.
+A new operating model for high-stakes release, not a safer file vault. Exam release becomes a policy problem instead of a custody problem: papers go out the night before to every centre, and no centre, administrator or server can read them early. Workflow tools track approvals, but an operator can still override them. Here nobody can.
 
 ### 2. Trust constraint insight
-Every exam has someone holding reusable authority over the paper. NEET-UG 2024 ran at 4,750 centres, and its paper was taken from a trunk at one. In software, that someone is whoever runs the server. Remove them and papers can be distributed early without being readable early.
+The problem is not storage; it is unilateral authority. Exam release fails whenever one person or system can act alone. NEET-UG 2024 ran at 4,750 centres, and its paper was taken from a trunk at one. In software, that person is whoever runs the server.
 
 ### 3. Value & impact
-Before: printed early, couriered, guarded. After: a paper for Melbourne and Hanoi is uploaded the night before and opens at 9:00 when two board members sign.
-- **Students:** fewer re-sits. UGC-NET 2024 was cancelled for 900,000 candidates over a doctored screenshot.
-- **Remote centres:** no strong rooms.
-- **Auditors:** proof of who could read each paper.
+Before: printed early, couriered, guarded. After: uploaded encrypted the night before, opened at 9:00 by quorum.
+- **Boards:** no custody chain to coordinate.
+- **Centres:** no couriers or strong rooms.
+- **Candidates:** fewer cancellations. UGC-NET 2024 was cancelled for 900,000 people over a screenshot later found doctored.
+- **Auditors:** a signed record per sitting.
 
 ### 4. Why TideCloak matters
-TideCloak cryptographically enforces who can decrypt and authorise release, even if the server is compromised. Each paper is encrypted under a policy bound to its exam; opening needs 2 of 3 board signatures. With ordinary login, whoever runs the server could override that.
+TideCloak makes release authority emerge only when 2 of 3 board members sign. The app server never holds a reusable opening key and cannot grant itself one.
 
 ### 5. Prototype & storytelling
-The [2-minute demo](demo/exam-vault-demo.mp4) runs the live app. Hoa seals a paper; the server holds ciphertext only. **Key moment:** Sam, the IT administrator, clicks Open and all 20 Tide nodes refuse; Sam's self-grant stalls. Final proof: after 2 board signatures, Minh opens a watermarked copy, and the leak check shows only Hoa could read it earlier.
+**Key moment:** Sam, the IT administrator, clicks Open and all 20 Tide nodes refuse; Sam's self-grant stalls. The [2-minute demo](demo/exam-vault-demo.mp4) runs the live app: Hoa seals a paper, Sam is refused, two board members release it to Minh, Minh opens a watermarked copy, and the leak check shows only Hoa could read it earlier.
 
 ![Sealed paper](docs/app.png)
 
 ![Watermarked copy](docs/open.png)
 
 ![Leak check](docs/leak-check.png)
+
+## How it works: TideCloak vs the app
+
+| | TideCloak enforces | Exam Vault (the app) does |
+|---|---|---|
+| **Sealing** | Encrypts the paper through the Tide network under a policy bound to one exam. No key is ever stored by the app. | Gives the examiner a sheet to write on and stores the ciphertext. |
+| **Release** | The opening role (`_tide_decryptor`) can only be granted by a change request that 2 of 3 board members sign in their own Tide enclaves. The app server cannot manufacture it. | Shows who holds the key, collects requests, and lets each board member approve or deny. |
+| **Opening** | The Tide nodes decrypt only when identity, role and policy line up. The authority emerges at that moment; nobody holds it in advance. | Shows the paper with a watermark naming the holder and the time. |
+| **Proof** | Every grant carries board signatures with timestamps. | Turns them into the chain of custody and the leak check. |
+
+What a breach gets: the server holds ciphertext and signed policies, no key and no plaintext. An administrator who controls the server and the identity system is refused by the network like anyone else, and their own request for the key stalls at 1 of 2 signatures.
 
 ## Setup
 
