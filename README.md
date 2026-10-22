@@ -82,4 +82,4 @@ What a breach gets: the server holds ciphertext and signed policies, no key and 
 - **Data:** papers, signed policies and the app log live in `data/store.json`, which is gitignored. All people and papers are synthetic.
 - **Limits:** once a paper is open, nothing stops a photo of the screen. The watermark names who opened it and when. Revoking the key stops future opening, not copies already made.
 
-More detail: [what is in the app and the implementation choices](docs/DETAILS.md).
+More detail: [threat model, what is in the app and implementation choices](docs/DETAILS.md).
