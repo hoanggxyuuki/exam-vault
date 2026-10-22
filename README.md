@@ -2,34 +2,43 @@
 
 ## Project overview
 
-_Exam Vault removes unilateral release authority from exams: boards can distribute papers early to every centre, and nobody, not even IT, can open one before the board signs its release._
+_Exam Vault removes unilateral release authority from exams: papers reach every centre early, and nobody, not even IT, can open one before the board signs._
 
 Built with [TideCloak](https://tide.org/tidecloak?utm_source=github&utm_medium=readme&utm_campaign=unlocked).
 
 ### 1. Vision & originality
-A new operating model for high-stakes release, not a safer file vault. Exam release becomes a policy problem instead of a custody problem: papers go out the night before to every centre, and no centre, administrator or server can read them early. Workflow tools track approvals, but an operator can still override them. Here nobody can.
+Coordination at scale without custody at scale. Exam Vault separates possession from access: anyone can carry a paper, because carrying it no longer means reading it. So papers go to every centre early, and rival universities can even share one exam bank, released by a board drawn from each. This is not an approval workflow, where approval is a flag whoever runs the server can flip. Here the board's signatures are the only way to open the paper.
 
 ### 2. Trust constraint insight
 The problem is not storage; it is unilateral authority. Exam release fails whenever one person or system can act alone. NEET-UG 2024 ran at 4,750 centres, and its paper was taken from a trunk at one. In software, that person is whoever runs the server.
 
 ### 3. Value & impact
-Before: printed early, couriered, guarded. After: uploaded encrypted the night before, opened at 9:00 by quorum.
-- **Boards:** no custody chain to coordinate.
-- **Centres:** no couriers or strong rooms.
-- **Candidates:** fewer cancellations. UGC-NET 2024 was cancelled for 900,000 people over a screenshot later found doctored.
-- **Auditors:** a signed record per sitting.
+- **Boards** stop running a custody chain.
+- **Centres** need no strong room or courier.
+- **Candidates** stop paying for leaks and rumours: UGC-NET 2024 was cancelled for 900,000 people over a screenshot later found doctored.
+- **Auditors** get a signed record of who could read each paper.
 
 ### 4. Why TideCloak matters
 TideCloak makes release authority emerge only when 2 of 3 board members sign. The app server never holds a reusable opening key and cannot grant itself one.
 
 ### 5. Prototype & storytelling
-**Key moment:** Sam, the IT administrator, clicks Open and all 20 Tide nodes refuse; Sam's self-grant stalls. The [2-minute demo](demo/exam-vault-demo.mp4) runs the live app: Hoa seals a paper, Sam is refused, two board members release it to Minh, Minh opens a watermarked copy, and the leak check shows only Hoa could read it earlier.
+The [2-minute demo](demo/exam-vault-demo.mp4) runs the live app. **Key moment (0:46):** Sam, the IT administrator, clicks Open and all 20 Tide nodes refuse; Sam's self-grant stalls. Then two board members release it to Minh, who opens a watermarked copy; the leak check shows only Hoa could read it earlier.
 
 ![Sealed paper](docs/app.png)
 
 ![Watermarked copy](docs/open.png)
 
 ![Leak check](docs/leak-check.png)
+
+## Watch for this in the demo
+
+| Time | What happens | Why it matters |
+|---|---|---|
+| 0:33 | Hoa seals the paper. **What the server holds** shows ciphertext, no key, no plaintext. | A breach of the server yields nothing readable. |
+| **0:46** | **Sam, the IT administrator, clicks Open. 20 of 20 Tide nodes refuse. Sam asks for the key; the request stalls at 1 of 2 signatures.** | **Running the server and the identity system is not enough to open a paper.** |
+| 1:05 | Hoa denies Sam's request and asks the board to release the paper to Minh. Two signatures commit it. | Opening authority emerges only from the quorum. |
+| 1:21 | Minh, the Chief Invigilator, opens a watermarked copy. | Every copy names who opened it and when. |
+| 1:29 | The leak check: before 11:06:37, nobody but Hoa could read the paper. | A leak rumour can be checked in seconds. |
 
 ## How it works: TideCloak vs the app
 
@@ -73,16 +82,4 @@ What a breach gets: the server holds ciphertext and signed policies, no key and 
 - **Data:** papers, signed policies and the app log live in `data/store.json`, which is gitignored. All people and papers are synthetic.
 - **Limits:** once a paper is open, nothing stops a photo of the screen. The watermark names who opened it and when. Revoking the key stops future opening, not copies already made.
 
-**What is in the app**
-- **Sealed envelope.** The paper is shown as a sealed exam envelope. Its security tint is the real ciphertext.
-- **Release panel.** Shows who may seal, who may open, and who holds the opening key right now. Each pending request has three signature seals that fill as board members sign.
-- **Leak check.** Sits on top of the chain of custody. It states the minute before which nobody but the author could have read the paper, who signed the release, every refused attempt, and when the paper was opened. If a copy surfaces online earlier than that minute, it can only have come from the author.
-- **Chain of custody.** A timeline per sitting. It merges the app's own log (sealed, opening refused, opened) with TideCloak's change requests: who asked, each signature with its time, the commit or the denial.
-- **Server view.** Shows the full server record for the sitting: ciphertext and signed policies, no key and no plaintext.
-- **Exam-room copy.** An opened paper carries a watermark with the holder's name and the time. **Present in exam room** shows it full screen.
-
-**Implementation choices**
-- **Approvals stay in the browser.** Change requests are approved from the board member's own browser, with their DPoP-bound token (`IAMService.secureFetch`). They never go through the app server, so every signature belongs to a real person (`lib/tide/governance.ts`).
-- **Policy and encryption code.** `lib/tide/relationship.ts` comes from the Tide agent pack's `RelationshipAttestation:1` template.
-- **Two policies per sitting.** Sealing is authorised for the `lecturer` role and opening for the `invigilator` role. Holding the role is not enough: the caller also needs `_tide_encryptor` or `_tide_decryptor`. The board grants `_tide_decryptor` for the sitting and revokes it afterwards.
-- **Storage.** A JSON file instead of a database, because the server only ever holds ciphertext and signed policies.
+More detail: [what is in the app and the implementation choices](docs/DETAILS.md).
